@@ -2,7 +2,7 @@
 /*
 Plugin Name: Affiliate Manager
 Description: Wtyczka do zarządzania handlowcami i śledzenia zamówień w WooCommerce.
-Version: 1.1.0
+Version: 1.1.1
 Author: DoubleM
 */
 
@@ -10,6 +10,76 @@ Author: DoubleM
 if (!defined('ABSPATH')) {
     exit;
 }
+
+
+// Hook to check for plugin updates
+add_filter('site_transient_update_plugins', 'sprawdz_aktualizacje_wtyczki');
+
+function sprawdz_aktualizacje_wtyczki($transient) {
+    // Tylko sprawdzaj aktualizacje, jeśli nie jesteśmy na stronie admina wtyczek
+    if (empty($transient->checked)) {
+        return $transient;
+    }
+
+    // URL do pliku z informacjami o wersji wtyczki na GitHubie
+    $response = wp_remote_get('https://raw.githubusercontent.com/doublem-plugins/affiliate-manager/master/version.txt');
+
+    if (!is_wp_error($response) && isset($response['body'])) {
+        $remote_version = trim($response['body']);
+        $current_version = '1.0.0'; // Twoja obecna wersja wtyczki
+
+        if (version_compare($remote_version, $current_version, '>')) {
+            $plugin = array(
+                'slug' => 'affiliate-manager',
+                'new_version' => $remote_version,
+                'url' => 'https://github.com/doublem-plugins/affiliate-manager',
+                'package' => 'https://github.com/doublem-plugins/affiliate-manager/archive/refs/heads/master.zip'
+            );
+
+            $transient->response['affiliate-manager/affiliate-manager.php'] = $plugin;
+        }
+    }
+
+    return $transient;
+}
+
+// Hook to provide plugin info
+add_action('plugins_api', 'wtyczka_info', 10, 3);
+
+function wtyczka_info($false, $action, $args) {
+    if ($action !== 'plugin_information') {
+        return $false;
+    }
+
+    if ($args->slug !== 'affiliate-manager') {
+        return $false;
+    }
+
+    $response = wp_remote_get('https://api.github.com/repos/doublem-plugins/affiliate-manager/releases/latest');
+
+    if (!is_wp_error($response) && isset($response['body'])) {
+        $data = json_decode($response['body']);
+
+        $plugin_info = array(
+            'name'        => 'Affiliate Manager',
+            'slug'        => 'affiliate-manager',
+            'version'     => $data->tag_name,
+            'author'      => 'Twoje Imię',
+            'homepage'    => 'https://github.com/doublem-plugins/affiliate-manager',
+            'short_description' => $data->body,
+        );
+
+        return (object) $plugin_info;
+    }
+
+    return $false;
+}
+
+
+
+
+
+
 
 // Rejestracja nowego menu w panelu administracyjnym
 function affiliate_manager_menu() {
