@@ -1,5 +1,3 @@
-Opis
-
 Wtyczka Affiliate Manager umożliwia zarządzanie programem afiliacyjnym w WooCommerce. Umożliwia tworzenie handlowców, generowanie unikalnych kodów afiliacyjnych, śledzenie zamówień i generowanie raportów.
 
 Instalacja
