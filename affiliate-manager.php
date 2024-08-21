@@ -2,7 +2,7 @@
 /*
 Plugin Name: Affiliate Manager
 Description: Wtyczka do zarządzania handlowcami i śledzenia zamówień w WooCommerce.
-Version: 1.0.0
+Version: 1.1.0
 Author: DoubleM
 */
 
